@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Diabetes Risk Result</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>📊 Prediction Result</h1>
+      <div class="row">
+        <div class="kpi">
+          <div class="label">Risk Probability</div>
+          <div class="value">{{ (probability * 100) | round(2) }}%</div>
+        </div>
+        <div class="kpi">
+          <div class="label">Model Decision</div>
+          <div class="value">
+            {% if predicted_class == 1 %}
+              <span class="badge bad">Likely Diabetes</span>
+            {% else %}
+              <span class="badge ok">Likely Non-Diabetic</span>
+            {% endif %}
+          </div>
+        </div>
+        <div class="kpi">
+          <div class="label">Threshold</div>
+          <div class="value">0.5</div>
+        </div>
+      </div>
+
+      <h2>Your values vs dataset medians</h2>
+      <canvas id="barChart"></canvas>
+
+      <h2>Risk Gauge</h2>
+      <canvas id="gauge"></canvas>
+
+      <h2>Recommendations</h2>
+      <ul>
+        {% for tip in recommendations %}
+          <li>{{ tip }}</li>
+        {% endfor %}
+      </ul>
+
+      <p><a href="{{ url_for('home') }}">← Go back</a></p>
+      <footer>
+        <hr>
+        <p>Note: This is an educational tool and not a medical diagnosis.</p>
+      </footer>
+    </div>
+  </div>
+
+<script>
+const features = {{ feature_names | tojson }};
+const userVals = {{ user_values | tojson }};
+const medians = {{ medians | tojson }};
+
+const ctx = document.getElementById('barChart');
+new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: features,
+    datasets: [
+      {
+        label: 'You',
+        data: userVals
+      },
+      {
+        label: 'Dataset Median',
+        data: medians
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: true }
+    },
+    scales: {
+      x: { ticks: { autoSkip: false } }
+    }
+  }
+});
+
+// Simple radial gauge using a doughnut chart
+const risk = {{ probability }};
+const gctx = document.getElementById('gauge');
+new Chart(gctx, {
+  type: 'doughnut',
+  data: {
+    labels: ['Risk', 'Remaining'],
+    datasets: [{
+      data: [risk * 100, 100 - (risk * 100)],
+      circumference: 180,
+      rotation: 270,
+      cutout: '70%'
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: { enabled: false }
+    }
+  }
+});
+</script>
+</body>
+</html>

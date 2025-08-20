@@ -1,0 +1,4 @@
+Pregnancies,Glucose,BloodPressure,SkinThickness,Insulin,BMI,DiabetesPedigreeFunction,Age,probability,prediction
+2.0,130.0,72.0,25.0,80.0,30.5,0.5,35.0,0.43516753710619727,0
+3.0,150.0,70.0,25.0,90.0,40.0,1.0,35.0,0.8871150567592224,1
+3.0,140.0,180.0,30.0,50.0,50.0,2.0,29.0,0.9671183606820859,1
